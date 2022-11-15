@@ -1,0 +1,19 @@
+{
+  "name": "activity-planner",
+  "version": "1.0.0",
+  "description": "a little bot to create actitvity post for my Discord Server.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ascii-table": "^0.0.9",
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3",
+    "moment": "^2.29.4",
+    "mongoose": "^6.7.2"
+  }
+}
