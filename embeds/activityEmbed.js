@@ -31,7 +31,7 @@ module.exports.activityEmbedBuilder = async (activity) => {
       }
     )
     .addFields({
-      name: `Participants:`,
+      name: `**Participants:**`,
       value: participants,
     })
     .setImage(activity.image)

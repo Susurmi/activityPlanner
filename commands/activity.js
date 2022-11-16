@@ -38,6 +38,7 @@ module.exports = {
         .setDescription("Display an image of your activity.")
     ),
   async execute(interaction, client) {
+    if (!interaction) return interaction.reply("❌ An error occured! ❌");
     const img = () => {
       if (!interaction.options.get("image")) return;
       return interaction.options.get("image").value;
@@ -66,6 +67,10 @@ module.exports = {
         },
       ],
     };
+    await interaction.reply({
+      content: "Activity Post has been created, sending ...",
+      ephemeral: true,
+    });
     const activityEmbed = await activityEmbedBuilder(activity);
     const msg = await interaction.channel.send({
       embeds: [activityEmbed],
@@ -74,9 +79,5 @@ module.exports = {
     });
     activity.post = msg.id;
     client.activities.push(activity);
-    interaction.reply({
-      content: "Your Activity has been posted!",
-      ephemeral: true,
-    });
   },
 };

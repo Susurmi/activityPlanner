@@ -29,9 +29,11 @@ module.exports.joinActivity = async (interaction, client) => {
   }
   if (customId === "signOut") {
     if (interaction.user.id === activity.author.userId) {
-      return interaction.reply(
-        "If you want to delete the activity you need to delete the post as of right now."
-      );
+      return interaction.reply({
+        content:
+          "If you want to delete the activity you need to delete the post as of right now.",
+        ephemeral: true,
+      });
     }
     if (!participant || participant === undefined) {
       return interaction.reply({
