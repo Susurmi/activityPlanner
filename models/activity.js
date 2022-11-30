@@ -1,0 +1,1 @@
+const mogoose = reuqire('mongoose');
