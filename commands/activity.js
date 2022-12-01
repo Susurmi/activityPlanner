@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { activityEmbedBuilder } = require('../embeds/activityEmbed.js');
 const { activityButtons } = require('../buttons/activityButtons.js');
+const Activity = require('../models/activityModel');
 const moment = require('moment');
 moment.locale('de');
 
@@ -58,6 +59,7 @@ module.exports = {
         description: interaction.options.get('description').value,
         image: img(),
         post: '',
+        channel: '',
         participants: [
           {
             userName: interaction.user.tag,
@@ -77,6 +79,9 @@ module.exports = {
         fetchReply: true,
       });
       activity.post = msg.id;
+      activity.channel = msg.channel;
+      const newActivity = await Activity.create(activity);
+      newActivity.save();
       client.activities.push(activity);
     } catch (error) {
       console.log(error);

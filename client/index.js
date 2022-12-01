@@ -1,11 +1,12 @@
-require("dotenv").config();
-const { Client, GatewayIntentBits, Collection } = require("discord.js");
-const mongoose = require("mongoose");
+require('dotenv').config();
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const mongoose = require('mongoose');
+const Activity = require('../models/activityModel');
 const {
   eventHandler,
   deployCommands,
   commandHandler,
-} = require("./handlers/index.js");
+} = require('./handlers/index.js');
 
 class ExtendedClient extends Client {
   // creating a command collection needed by the commandHandler
@@ -30,8 +31,25 @@ class ExtendedClient extends Client {
   async connectDB(URI) {
     await mongoose
       .connect(URI)
-      .then(console.log("Datenbank verbunden"))
+      .then(console.log('Datenbank verbunden'))
       .catch((err) => console.log(err));
+  }
+
+  async getActivitys(client) {
+    const allEvents = await Activity.find();
+    client.activities = allEvents;
+    if (!allEvents) return;
+    client.on('ready', () => {
+      allEvents.forEach(async (element) => {
+        try {
+          const eventChannel = await client.channels.cache.get(element.channel);
+          await eventChannel.messages.fetch(element.post);
+        } catch (error) {
+          Activity.deleteOne({ post: element.post });
+        }
+      });
+    });
+    console.log('Geladene Events:' + allEvents.length);
   }
 
   // automatet startup function that connects to the DB and loads all events/commands and registers them at the discord API
@@ -41,6 +59,7 @@ class ExtendedClient extends Client {
     await eventHandler(this);
     await commandHandler(this);
     this.login(token);
+    await this.getActivitys(this);
   }
 }
 
