@@ -1,7 +1,7 @@
-const { joinActivity } = require("../functions/joinActivity.js");
+const { joinActivity } = require('../functions/joinActivity.js');
 
 module.exports = {
-  name: "interactionCreate",
+  name: 'interactionCreate',
   once: false,
   async execute(interaction, client) {
     if (interaction.isButton()) joinActivity(interaction, client);
@@ -11,14 +11,14 @@ module.exports = {
 
     if (!command) return;
 
-    try {
-      await command.execute(interaction, client);
-    } catch (error) {
-      console.error(error);
-      await interaction.reply({
-        content: "Es ist ein Fehler aufgetreten! 🛑",
+    await command.execute(interaction, client).catch((e) => {
+      console.log(e);
+      if (!interaction) return;
+      interaction.reply({
+        content: 'Es ist ein Fehler aufgetreten! 🛑',
         ephemeral: true,
       });
-    }
+      return;
+    });
   },
 };
