@@ -1,9 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { activityEmbedBuilder } = require('../embeds/activityEmbed.js');
 const { activityButtons } = require('../buttons/activityButtons.js');
-const Activity = require('../models/activityModel');
-const moment = require('moment');
-moment.locale('de');
+const { convertToUnix } = require('../functions/timeUtil.js');
+const Activity = require('../models/activityModel.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -40,22 +39,18 @@ module.exports = {
     ),
   async execute(interaction, client) {
     try {
-      const img = interaction.options.get('image');
-      if (!interaction.options.get('image')) img = '';
-      const unixDate = await moment(
-        interaction.options.get('date').value +
-          ' ' +
-          interaction.options.get('time').value,
-        'DD/MM/YYYY hh:mm'
-      ).unix();
-      const activity = {
+      const img = interaction.options.get('image') ?? '';
+      const date = interaction.options.get('date').value;
+      const time = interaction.options.get('time').value;
+      const unixTimestamp = convertToUnix(date, time);
+      const newActivity = await Activity.create({
         author: {
           userName: interaction.user.tag,
           userId: interaction.user.id,
           iconUrl: interaction.user.avatarURL({ dynamic: true, size: 256 }),
         },
         title: interaction.options.get('title').value,
-        time: unixDate,
+        time: unixTimestamp,
         description: interaction.options.get('description').value,
         image: img(),
         post: '',
@@ -66,10 +61,9 @@ module.exports = {
             userId: interaction.user.id,
           },
         ],
-      };
-
-      const activityEmbed = await activityEmbedBuilder(activity);
-      await interaction.reply({
+      });
+      const activityEmbed = await activityEmbedBuilder(newActivity);
+      interaction.reply({
         content: 'Activity Post has been created, sending ...',
         ephemeral: true,
       });
@@ -78,11 +72,10 @@ module.exports = {
         components: [activityButtons],
         fetchReply: true,
       });
-      activity.post = msg.id;
-      activity.channel = msg.channel;
-      const newActivity = await Activity.create(activity);
+      newActivity.post = msg.id;
+      newActivity.channel = msg.channel;
       newActivity.save();
-      client.activities.push(activity);
+      client.activities.push(newActivity);
     } catch (error) {
       console.log(error);
       interaction.reply('❌ An error occured! ❌');
