@@ -35,7 +35,7 @@ module.exports = {
         .setDescription('Display an image of your activity.')
     ),
   async execute(interaction, client) {
-    await createActivity(interaction, client).then((afzer) => {
+    await createActivity(interaction, client).then((after) => {
       interaction.reply({
         content: 'Activity Post has been created, sending ...',
         ephemeral: true,

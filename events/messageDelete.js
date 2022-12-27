@@ -5,7 +5,7 @@ module.exports = {
   once: false,
   async execute(message, client) {
     const activity = await client.activities.find((x) => x.post === message.id);
-    if (raidObject === undefined) return;
+    if (activity === undefined) return;
     try {
       const activitiesArray = client.activities;
       let index = activitiesArray

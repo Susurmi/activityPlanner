@@ -7,7 +7,6 @@ const createActivity = async (interaction, client) => {
   const img = interaction.options.get('image') ?? '';
   const date = interaction.options.get('date').value;
   const time = interaction.options.get('time').value;
-  const unixTimestamp = convertToUnix(date, time);
   try {
     const newActivity = await Activity.create({
       author: {
@@ -16,11 +15,11 @@ const createActivity = async (interaction, client) => {
         iconUrl: interaction.user.avatarURL({ dynamic: true, size: 256 }),
       },
       title: interaction.options.get('title').value,
-      time: unixTimestamp,
+      time: await convertToUnix(date, time),
       description: interaction.options.get('description').value,
-      image: img(),
-      post: '',
-      channel: '',
+      image: img,
+      post: 'undefined',
+      channel: interaction.channel.id,
       participants: [
         {
           userName: interaction.user.tag,
@@ -28,7 +27,7 @@ const createActivity = async (interaction, client) => {
         },
       ],
     });
-    const activityEmbed = await activityEmbedBuilder(newActivity);
+    const activityEmbed = await activityEmbedBuilder(newActivity, interaction);
     const msg = await interaction.channel.send({
       embeds: [activityEmbed],
       components: [activityButtons],
@@ -41,7 +40,7 @@ const createActivity = async (interaction, client) => {
     return;
   } catch (error) {
     console.log(error);
-    interaction.reply('❌ An error occured! ❌');
+    interaction.reply({ content: '❌ An error occured! ❌', ephemeral: true });
   }
 };
 
