@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { createActivity } = require('../functions/createActivity.js');
+const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -35,8 +36,10 @@ module.exports = {
         .setDescription('Display an image of your activity.')
     ),
   async execute(interaction, client) {
+    interaction.deferReply();
+    await wait(4000);
     await createActivity(interaction, client).then((after) => {
-      interaction.reply({
+      interaction.editReply({
         content: 'Activity Post has been created, sending ...',
         ephemeral: true,
       });
